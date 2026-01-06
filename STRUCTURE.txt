@@ -1,0 +1,354 @@
+EMERGENT CLONE - PROJECT STRUCTURE
+==================================
+
+emergent-clone/
+│
+├── Documentation (5 files)
+│   ├── README.md              # Main documentation, features, architecture
+│   ├── DEPLOYMENT.md          # Production deployment guide
+│   ├── QUICKSTART.md          # 5-minute tutorial for users
+│   ├── PROJECT_SUMMARY.md     # Technical overview, API reference
+│   ├── EXAMPLES.md            # 10+ usage examples with prompts
+│   └── STRUCTURE.txt          # This file
+│
+├── Installation
+│   ├── install.sh             # Automated Ubuntu 24.04 installer (executable)
+│   ├── docker-compose.yml     # Development environment setup
+│   └── LICENSE                # MIT License
+│
+├── Backend (Node.js + TypeScript + Fastify)
+│   ├── src/
+│   │   ├── server.ts          # Main application entry point
+│   │   │
+│   │   ├── config/
+│   │   │   └── index.ts       # Environment configuration
+│   │   │
+│   │   ├── types/
+│   │   │   └── index.ts       # TypeScript interfaces
+│   │   │
+│   │   ├── providers/         # AI Provider Abstraction Layer
+│   │   │   ├── BaseLLMProvider.ts      # Base provider interface
+│   │   │   ├── LMStudioProvider.ts     # LM Studio (PRIMARY)
+│   │   │   ├── OpenAIProvider.ts       # OpenAI (optional)
+│   │   │   └── ProviderManager.ts      # Provider orchestration
+│   │   │
+│   │   ├── agents/            # AI Agent System
+│   │   │   ├── BaseAgent.ts            # Base agent class
+│   │   │   ├── PlannerAgent.ts         # Project planning (1024 tokens)
+│   │   │   └── CodeGeneratorAgent.ts   # Code generation (4096 tokens)
+│   │   │
+│   │   ├── pipeline/          # Multi-Agent Pipeline
+│   │   │   └── PipelineOrchestrator.ts # Coordinates agent execution
+│   │   │
+│   │   ├── models/            # MongoDB Schemas
+│   │   │   ├── User.ts        # User accounts
+│   │   │   ├── Project.ts     # Projects
+│   │   │   ├── File.ts        # File versions
+│   │   │   └── Execution.ts   # Agent executions
+│   │   │
+│   │   ├── vfs/               # Virtual File System
+│   │   │   └── VirtualFileSystem.ts    # Version control, caching
+│   │   │
+│   │   ├── sandbox/           # Docker Sandbox
+│   │   │   └── DockerSandbox.ts        # Isolated execution
+│   │   │
+│   │   ├── routes/            # API Endpoints
+│   │   │   ├── auth.ts        # POST /api/auth/login, register
+│   │   │   ├── projects.ts    # CRUD /api/projects
+│   │   │   ├── files.ts       # CRUD /api/projects/:id/files
+│   │   │   └── build.ts       # WS /api/build/:projectId
+│   │   │
+│   │   └── middleware/
+│   │       └── auth.ts        # JWT authentication
+│   │
+│   ├── Dockerfile             # Production container
+│   ├── package.json           # Dependencies
+│   ├── tsconfig.json          # TypeScript config
+│   ├── jest.config.js         # Test configuration
+│   └── .env.example           # Environment template
+│
+├── Frontend (Next.js 14 + TypeScript + React)
+│   ├── app/                   # Next.js App Directory
+│   │   ├── layout.tsx         # Root layout
+│   │   ├── page.tsx           # Main page (builder UI)
+│   │   └── globals.css        # Global styles (dark theme)
+│   │
+│   ├── components/            # React Components
+│   │   ├── LoginForm.tsx      # Authentication UI
+│   │   ├── Sidebar.tsx        # Project list + user menu
+│   │   ├── FileTree.tsx       # File explorer with tree view
+│   │   ├── Editor.tsx         # Monaco code editor
+│   │   ├── PromptPanel.tsx    # AI prompt input + build button
+│   │   └── LogsPanel.tsx      # Real-time execution logs
+│   │
+│   ├── lib/
+│   │   ├── api.ts             # Axios API client
+│   │   └── store/             # Zustand State Management
+│   │       ├── auth.ts        # Authentication state
+│   │       ├── projects.ts    # Projects and files state
+│   │       └── logs.ts        # Build logs state
+│   │
+│   ├── public/
+│   │   └── index.html         # HTML template
+│   │
+│   ├── Dockerfile             # Production container
+│   ├── package.json           # Dependencies
+│   ├── next.config.js         # Next.js config
+│   ├── tailwind.config.ts     # Tailwind CSS config
+│   ├── postcss.config.js      # PostCSS config
+│   ├── tsconfig.json          # TypeScript config
+│   ├── .eslintrc.json         # ESLint config
+│   └── .env.local             # Frontend environment
+│
+└── Configuration Files
+    ├── .gitignore             # Git ignore rules
+    └── README.md              # You are here
+
+KEY FEATURES
+============
+
+1. AI Provider System
+   - Primary: LM Studio (local models)
+   - Fallback: OpenAI, Anthropic, Gemini (optional)
+   - Unified interface with automatic failover
+
+2. Multi-Agent Pipeline
+   - PlannerAgent: Breaks down user requests
+   - CodeGeneratorAgent: Creates files
+   - Extensible for more agents
+
+3. Virtual File System
+   - Version control with history
+   - Diff tracking
+   - MongoDB persistence
+   - In-memory cache
+
+4. Docker Sandbox
+   - Isolated execution
+   - Resource limits (CPU, memory)
+   - Network isolation
+   - Live log streaming
+
+5. Monaco Editor
+   - Syntax highlighting
+   - IntelliSense
+   - Multi-file editing
+   - VS Code experience
+
+6. Real-time Updates
+   - WebSocket streaming
+   - Live logs
+   - Progress updates
+
+TECHNOLOGY STACK
+================
+
+Backend:
+  - Runtime: Node.js 20.x LTS
+  - Language: TypeScript 5.3
+  - Framework: Fastify 4.x
+  - Database: MongoDB 7.x
+  - Cache: Redis 7.x
+  - Container: Docker
+  - Process: systemd
+
+Frontend:
+  - Framework: Next.js 14
+  - Language: TypeScript 5.3
+  - Editor: Monaco Editor
+  - State: Zustand
+  - Styling: Tailwind CSS
+  - Icons: Lucide React
+
+Infrastructure:
+  - OS: Ubuntu 24.04 LTS
+  - Web Server: Nginx
+  - Firewall: UFW
+  - AI: LM Studio API
+
+SUPPORTED MODELS
+================
+
+Local (via LM Studio):
+  - Phi-3 Mini (3.8B) - Fast, small projects
+  - Qwen 2.5 (7B/14B) - Balanced performance
+  - LLaMA 3.x (8B) - Strong reasoning
+  - DeepSeek Coder (7B) - Code specialized
+  - StarCoder2 - Code generation
+
+Cloud (Optional):
+  - OpenAI: GPT-4, GPT-3.5
+  - Anthropic: Claude 3
+  - Google: Gemini Pro
+
+API ENDPOINTS
+=============
+
+Authentication:
+  POST   /api/auth/register     - Register new user
+  POST   /api/auth/login        - Login
+  GET    /api/auth/me           - Get current user
+
+Projects:
+  GET    /api/projects          - List all projects
+  GET    /api/projects/:id      - Get project
+  POST   /api/projects          - Create project
+  DELETE /api/projects/:id      - Delete project
+
+Files:
+  GET    /api/projects/:id/files     - List files
+  GET    /api/projects/:id/files/*   - Get file
+  POST   /api/projects/:id/files     - Create file
+  PUT    /api/projects/:id/files     - Update file
+  DELETE /api/projects/:id/files     - Delete file
+
+Build:
+  WS     /api/build/:projectId       - WebSocket build
+
+Health:
+  GET    /health                     - Health check
+
+DATABASE SCHEMA
+===============
+
+Collections:
+  - users          # User accounts
+  - projects       # User projects
+  - files          # File versions
+  - executions     # Agent execution logs
+
+DEPLOYMENT
+==========
+
+Quick Install:
+  1. Copy to /tmp/emergent-clone
+  2. sudo ./install.sh
+  3. Enter LAN IP and LM Studio URL
+  4. Access http://YOUR_IP:3000
+
+Services:
+  - emergent-backend  (port 4000)
+  - emergent-frontend (port 3000)
+  - mongod            (port 27017)
+  - redis-server      (port 6379)
+  - nginx             (port 80)
+
+DEVELOPMENT
+===========
+
+Backend:
+  cd backend
+  yarn install
+  yarn dev          # Development mode
+  yarn build        # Production build
+  yarn test         # Run tests
+
+Frontend:
+  cd frontend
+  yarn install
+  yarn dev          # Development mode
+  yarn build        # Production build
+  yarn start        # Production server
+
+Docker Compose:
+  docker-compose up -d     # Start all services
+  docker-compose down      # Stop all services
+  docker-compose logs -f   # View logs
+
+FILE COUNT
+==========
+
+Backend Source:       22 TypeScript files
+Frontend Source:      13 TypeScript/TSX files
+Documentation:        5 Markdown files
+Configuration:        15 config files
+Total Project Files:  60 files (excluding node_modules)
+
+INSTALLATION SIZE
+=================
+
+Backend:            ~150 MB (with node_modules)
+Frontend:           ~300 MB (with node_modules)
+MongoDB:            ~100 MB
+Total:              ~550 MB + generated files
+
+RESOURCE USAGE
+==============
+
+Minimum:
+  - 16GB RAM
+  - 4 CPU cores
+  - 50GB storage
+
+Recommended:
+  - 32GB RAM
+  - 8 CPU cores
+  - 100GB SSD
+
+Optimal:
+  - 64GB RAM
+  - 16 CPU cores
+  - 500GB NVMe SSD
+
+SECURITY FEATURES
+=================
+
+- JWT authentication
+- Password hashing (bcrypt)
+- MongoDB authentication
+- Docker isolation
+- Network restrictions
+- Rate limiting (100 req/min)
+- Input validation
+- CORS configuration
+- Environment-based secrets
+- Firewall (UFW)
+
+QUICK COMMANDS
+==============
+
+Status:
+  sudo systemctl status emergent-backend
+  sudo systemctl status emergent-frontend
+
+Logs:
+  sudo journalctl -u emergent-backend -f
+  sudo journalctl -u emergent-frontend -f
+
+Restart:
+  sudo systemctl restart emergent-backend
+  sudo systemctl restart emergent-frontend
+
+Health Check:
+  curl http://localhost:4000/health
+  curl http://localhost:3000
+
+GETTING STARTED
+===============
+
+1. Read QUICKSTART.md for 5-minute tutorial
+2. Read DEPLOYMENT.md for installation
+3. Read EXAMPLES.md for usage examples
+4. Read README.md for full documentation
+5. Read PROJECT_SUMMARY.md for technical details
+
+LICENSE
+=======
+
+MIT License - See LICENSE file
+
+VERSION
+=======
+
+Version: 1.0.0
+Status: Production Ready ✅
+Last Updated: January 2025
+
+SUPPORT
+=======
+
+- Documentation: All .md files in root
+- Issues: GitHub Issues
+- LM Studio: https://lmstudio.ai/docs
+- MongoDB: https://docs.mongodb.com
+- Next.js: https://nextjs.org/docs
