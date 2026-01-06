@@ -189,8 +189,44 @@ export function Sidebar() {
           </div>
         </div>
       )}
+
+      {showProviderSettings && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-background border border-border rounded-lg w-full max-w-4xl h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-xl font-semibold">Provider Settings</h2>
+              <button
+                onClick={() => setShowProviderSettings(false)}
+                className="px-4 py-2 bg-secondary hover:bg-secondary/80 rounded-md transition"
+              >
+                Close
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <ProviderSettingsContent />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
+}
+
+// Dynamic content component for provider settings
+function ProviderSettingsContent() {
+  const [Component, setComponent] = useState<any>(null);
+
+  useEffect(() => {
+    import('./ProviderSettings').then((mod) => {
+      setComponent(() => mod.ProviderSettings);
+    });
+  }, []);
+
+  if (!Component) {
+    return <div className="flex items-center justify-center h-full">Loading...</div>;
+  }
+
+  return <Component />;
 }
 
 // Dynamic content component to avoid circular dependencies
