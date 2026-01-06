@@ -38,9 +38,9 @@ export const authAPI = {
 
 export const usersAPI = {
   list: () => api.get('/auth/users'),
-  create: (email: string, password: string, name: string, isAdmin: boolean) =>
-    api.post('/auth/users', { email, password, name, isAdmin }),
-  update: (id: string, data: { email?: string; name?: string; isAdmin?: boolean; password?: string }) =>
+  create: (username: string, email: string, password: string, name: string, isAdmin: boolean) =>
+    api.post('/auth/users', { username, email, password, name, isAdmin }),
+  update: (id: string, data: { username?: string; email?: string; name?: string; isAdmin?: boolean; password?: string }) =>
     api.put(`/auth/users/${id}`, data),
   delete: (id: string) => api.delete(`/auth/users/${id}`),
 };
