@@ -488,7 +488,8 @@ Installed: $(date)
 LAN IP: $LAN_IP
 
 Admin Credentials:
-  Email: admin
+  Username: admin
+  Email: admin@example.com
   Password: admin123
   IMPORTANT: Change this password after first login!
 
