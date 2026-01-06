@@ -44,8 +44,20 @@ export function UserManagement() {
 
   const handleCreate = async () => {
     setError('');
+    
+    // Validate username format
+    if (!/^[a-zA-Z0-9]+$/.test(formData.username)) {
+      setError('Username must be alphanumeric only');
+      return;
+    }
+    if (formData.username.length > 20) {
+      setError('Username must be 20 characters or less');
+      return;
+    }
+    
     try {
       await usersAPI.create(
+        formData.username,
         formData.email,
         formData.password,
         formData.name,
