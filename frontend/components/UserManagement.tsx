@@ -6,6 +6,7 @@ import { Users, Plus, Edit2, Trash2, Shield, X } from 'lucide-react';
 
 interface User {
   id: string;
+  username: string;
   email: string;
   name: string;
   isAdmin: boolean;
