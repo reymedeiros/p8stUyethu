@@ -50,12 +50,10 @@ async function start() {
 
     await fastify.register(authRoutes, { prefix: '/api' });
     await fastify.register(projectRoutes, { 
-      prefix: '/api',
-      onRequest: [authenticate]
+      prefix: '/api'
     });
     await fastify.register(fileRoutes, { 
-      prefix: '/api',
-      onRequest: [authenticate]
+      prefix: '/api'
     });
     await fastify.register(buildRoutes, { prefix: '/api' });
 
