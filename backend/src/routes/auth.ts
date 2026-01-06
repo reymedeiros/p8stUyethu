@@ -12,11 +12,19 @@ export async function authRoutes(fastify: FastifyInstance) {
     try {
       const { email, password } = request.body as any;
 
-      // Support login with username OR email
+      if (!email || !password) {
+        return reply.code(400).send({ error: 'Email/username and password are required' });
+      }
+
+      // Escape special regex characters to prevent regex injection
+      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const escapedEmail = escapeRegex(email.trim());
+
+      // Support case-insensitive login with username OR email
       const user = await User.findOne({
         $or: [
-          { email: email },
-          { username: email }
+          { email: { $regex: new RegExp(`^${escapedEmail}$`, 'i') } },
+          { username: { $regex: new RegExp(`^${escapedEmail}$`, 'i') } }
         ]
       });
       
