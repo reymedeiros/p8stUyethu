@@ -24,30 +24,19 @@ async function start() {
 
     await fastify.register(cors, {
       origin: (origin, cb) => {
-        // Allow requests with no origin (like mobile apps, curl, Postman)
-        if (!origin) {
+        // In development, allow all origins
+        if (config.env !== 'production') {
           cb(null, true);
           return;
         }
         
-        // List of allowed origins
+        // In production, only allow specific origins
         const allowedOrigins = [
           config.frontend.url,
           'http://localhost:3000',
-          'http://127.0.0.1:3000',
-          'http://0.0.0.0:3000',
         ];
         
-        // Allow any localhost/127.0.0.1 with any port in development
-        if (config.env !== 'production') {
-          const localhostPattern = /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?$/;
-          if (localhostPattern.test(origin)) {
-            cb(null, true);
-            return;
-          }
-        }
-        
-        if (allowedOrigins.includes(origin)) {
+        if (!origin || allowedOrigins.includes(origin)) {
           cb(null, true);
         } else {
           cb(new Error('Not allowed by CORS'), false);
