@@ -2,6 +2,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { vfs } from '../vfs/VirtualFileSystem';
 
 export async function fileRoutes(fastify: FastifyInstance) {
+  // Apply authentication to all routes in this plugin
+  fastify.addHook('onRequest', fastify.authenticate);
 
   fastify.get(
     '/projects/:projectId/files',
