@@ -27,7 +27,7 @@ Provide a technical plan.`;
       const response = await this.callLLM([
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
-      ], context.model);
+      ], context.userId, context.model);
 
       const plan = this.parsePlan(response);
 
