@@ -90,6 +90,13 @@ export function Sidebar() {
         </div>
 
         <div className="p-4 border-t border-border space-y-2">
+          <button
+            onClick={() => setShowProviderSettings(true)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded transition text-sm"
+          >
+            <Settings className="w-4 h-4" />
+            Providers
+          </button>
           {user?.isAdmin && (
             <button
               onClick={() => setShowUserManagement(true)}
