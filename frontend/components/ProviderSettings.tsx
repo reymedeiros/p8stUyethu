@@ -72,12 +72,12 @@ export function ProviderSettings() {
     setTestingId(id);
     try {
       const result = await providerApi.testProviderConnection(id);
-      setTestResults({ ...testResults, [id]: result });
+      setTestResults((prev) => ({ ...prev, [id]: { success: result.available, message: result.message } }));
     } catch (error: any) {
-      setTestResults({ 
-        ...testResults, 
+      setTestResults((prev) => ({ 
+        ...prev, 
         [id]: { success: false, message: error.message || 'Test failed' } 
-      });
+      }));
     } finally {
       setTestingId(null);
     }
