@@ -89,15 +89,28 @@ export async function authRoutes(fastify: FastifyInstance) {
     onRequest: [fastify.authenticate, checkAdmin]
   }, async (request: any, reply) => {
     try {
-      const { email, password, name, isAdmin } = request.body as any;
+      const { username, email, password, name, isAdmin } = request.body as any;
 
-      const existing = await User.findOne({ email });
-      if (existing) {
-        return reply.code(400).send({ error: 'User already exists' });
+      // Validate username format
+      if (!username || !/^[a-zA-Z0-9]+$/.test(username) || username.length > 20) {
+        return reply.code(400).send({ error: 'Username must be alphanumeric only (max 20 characters)' });
+      }
+
+      // Check for existing username
+      const existingUsername = await User.findOne({ username });
+      if (existingUsername) {
+        return reply.code(400).send({ error: 'Username already exists' });
+      }
+
+      // Check for existing email
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail) {
+        return reply.code(400).send({ error: 'Email already exists' });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = await User.create({
+        username,
         email,
         password: hashedPassword,
         name,
@@ -106,7 +119,8 @@ export async function authRoutes(fastify: FastifyInstance) {
 
       return { 
         user: { 
-          id: user._id, 
+          id: user._id,
+          username: user.username,
           email: user.email, 
           name: user.name,
           isAdmin: user.isAdmin,
