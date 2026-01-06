@@ -23,7 +23,10 @@ async function start() {
     console.log('✅ Connected to MongoDB');
 
     await fastify.register(cors, {
-      origin: true, // Allow all origins
+      origin: (origin, cb) => {
+        // Allow all origins when credentials are used
+        cb(null, true);
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
