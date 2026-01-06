@@ -12,7 +12,10 @@ export async function authRoutes(fastify: FastifyInstance) {
     try {
       const { email, password } = request.body as any;
 
+      fastify.log.info({ email }, 'Login attempt');
+
       if (!email || !password) {
+        fastify.log.warn('Login failed: Missing credentials');
         return reply.code(400).send({ error: 'Email/username and password are required' });
       }
 
@@ -29,11 +32,13 @@ export async function authRoutes(fastify: FastifyInstance) {
       });
       
       if (!user) {
+        fastify.log.warn({ email }, 'Login failed: User not found');
         return reply.code(401).send({ error: 'Invalid credentials' });
       }
 
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) {
+        fastify.log.warn({ email }, 'Login failed: Invalid password');
         return reply.code(401).send({ error: 'Invalid credentials' });
       }
 
@@ -42,6 +47,8 @@ export async function authRoutes(fastify: FastifyInstance) {
         email: user.email,
         isAdmin: user.isAdmin
       });
+
+      fastify.log.info({ email, userId: user._id.toString() }, 'Login successful');
 
       return { 
         token, 
@@ -54,7 +61,8 @@ export async function authRoutes(fastify: FastifyInstance) {
         } 
       };
     } catch (error: any) {
-      return reply.code(500).send({ error: error.message });
+      fastify.log.error({ error: error.message, stack: error.stack }, 'Login error');
+      return reply.code(500).send({ error: 'Internal server error. Please try again.' });
     }
   });
 
