@@ -10,6 +10,7 @@ import { authRoutes } from './routes/auth';
 import { projectRoutes } from './routes/projects';
 import { fileRoutes } from './routes/files';
 import { buildRoutes } from './routes/build';
+import { providerRoutes } from './routes/providers';
 
 const fastify = Fastify({
   logger: {
