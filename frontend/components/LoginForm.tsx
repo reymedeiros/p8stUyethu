@@ -21,8 +21,8 @@ export function LoginForm() {
     try {
       await login(emailOrUsername, password);
       // Successfully logged in, redirect to main panel
+      // Note: Removed router.refresh() as it causes state loss
       router.push('/');
-      router.refresh();
     } catch (err: any) {
       setError(err.response?.data?.error || 'Authentication failed');
     } finally {
