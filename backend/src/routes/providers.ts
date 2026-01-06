@@ -208,7 +208,7 @@ export async function providerRoutes(fastify: FastifyInstance) {
   fastify.delete<{ Params: { id: string } }>('/providers/configs/:id', {
     preHandler: [fastify.authenticate as any]
   }, async (request, reply) => {
-    const userId = (request.user as any).userId;
+    const userId = (request.user as any).id;
     const { id } = request.params;
 
     const result = await ProviderConfig.deleteOne({
