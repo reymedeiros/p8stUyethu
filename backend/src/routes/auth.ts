@@ -12,7 +12,14 @@ export async function authRoutes(fastify: FastifyInstance) {
     try {
       const { email, password } = request.body as any;
 
-      const user = await User.findOne({ email });
+      // Support login with username OR email
+      const user = await User.findOne({
+        $or: [
+          { email: email },
+          { username: email }
+        ]
+      });
+      
       if (!user) {
         return reply.code(401).send({ error: 'Invalid credentials' });
       }
@@ -31,7 +38,8 @@ export async function authRoutes(fastify: FastifyInstance) {
       return { 
         token, 
         user: { 
-          id: user._id, 
+          id: user._id,
+          username: user.username,
           email: user.email, 
           name: user.name,
           isAdmin: user.isAdmin
