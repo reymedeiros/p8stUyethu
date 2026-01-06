@@ -73,7 +73,7 @@ Project context:
     const response = await this.callLLM([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
-    ], context.model);
+    ], context.userId, context.model);
 
     return this.cleanCodeResponse(response);
   }
