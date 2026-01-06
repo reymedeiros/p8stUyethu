@@ -20,6 +20,19 @@ export interface IUser extends Document {
 }
 
 const userSchema = new Schema<IUser>({
+  username: { 
+    type: String, 
+    required: true, 
+    unique: true,
+    trim: true,
+    maxlength: 20,
+    validate: {
+      validator: function(v: string) {
+        return /^[a-zA-Z0-9]+$/.test(v);
+      },
+      message: 'Username must be alphanumeric only (max 20 characters)'
+    }
+  },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   name: { type: String, required: true },
