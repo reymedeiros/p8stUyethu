@@ -7,18 +7,17 @@ export class OpenAIProvider extends BaseLLMProvider {
   name = 'openai';
   private client: AxiosInstance;
 
-  constructor(apiKey?: string) {
+  constructor(apiKey: string, baseUrl?: string) {
     super();
-    const key = apiKey || config.ai.openai.apiKey;
-    if (!key) {
-      throw new Error('OpenAI API key not configured');
+    if (!apiKey) {
+      throw new Error('OpenAI API key is required');
     }
 
     this.client = axios.create({
-      baseURL: 'https://api.openai.com/v1',
+      baseURL: baseUrl || 'https://api.openai.com/v1',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${key}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       timeout: 120000,
     });
