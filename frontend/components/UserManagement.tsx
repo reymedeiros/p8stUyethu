@@ -73,8 +73,22 @@ export function UserManagement() {
   const handleUpdate = async () => {
     if (!editingUser) return;
     setError('');
+    
+    // Validate username format if provided
+    if (formData.username) {
+      if (!/^[a-zA-Z0-9]+$/.test(formData.username)) {
+        setError('Username must be alphanumeric only');
+        return;
+      }
+      if (formData.username.length > 20) {
+        setError('Username must be 20 characters or less');
+        return;
+      }
+    }
+    
     try {
       const updateData: any = {
+        username: formData.username,
         email: formData.email,
         name: formData.name,
         isAdmin: formData.isAdmin,
