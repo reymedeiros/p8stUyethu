@@ -6,14 +6,17 @@ import config from '../config';
 export class LMStudioProvider extends BaseLLMProvider {
   name = 'lmstudio';
   private client: AxiosInstance;
+  private defaultModel: string;
 
-  constructor() {
+  constructor(apiKey: string, baseUrl?: string, defaultModel?: string) {
     super();
+    this.defaultModel = defaultModel || 'local-model';
+    
     this.client = axios.create({
-      baseURL: config.ai.lmStudio.baseURL,
+      baseURL: baseUrl || 'http://localhost:1234/v1',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.ai.lmStudio.apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       timeout: 120000,
     });
