@@ -138,14 +138,35 @@ export async function authRoutes(fastify: FastifyInstance) {
   }, async (request: any, reply) => {
     try {
       const { id } = request.params;
-      const { email, name, isAdmin, password } = request.body as any;
+      const { username, email, name, isAdmin, password } = request.body as any;
 
       const user = await User.findById(id);
       if (!user) {
         return reply.code(404).send({ error: 'User not found' });
       }
 
-      if (email) user.email = email;
+      // Validate and update username if provided
+      if (username) {
+        if (!/^[a-zA-Z0-9]+$/.test(username) || username.length > 20) {
+          return reply.code(400).send({ error: 'Username must be alphanumeric only (max 20 characters)' });
+        }
+        // Check if username is taken by another user
+        const existingUsername = await User.findOne({ username, _id: { $ne: id } });
+        if (existingUsername) {
+          return reply.code(400).send({ error: 'Username already exists' });
+        }
+        user.username = username;
+      }
+
+      // Check if email is taken by another user
+      if (email) {
+        const existingEmail = await User.findOne({ email, _id: { $ne: id } });
+        if (existingEmail) {
+          return reply.code(400).send({ error: 'Email already exists' });
+        }
+        user.email = email;
+      }
+
       if (name) user.name = name;
       if (typeof isAdmin !== 'undefined') user.isAdmin = isAdmin;
       if (password) user.password = await bcrypt.hash(password, 10);
@@ -154,7 +175,8 @@ export async function authRoutes(fastify: FastifyInstance) {
 
       return { 
         user: { 
-          id: user._id, 
+          id: user._id,
+          username: user.username,
           email: user.email, 
           name: user.name,
           isAdmin: user.isAdmin,
