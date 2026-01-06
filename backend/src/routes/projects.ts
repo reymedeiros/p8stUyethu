@@ -3,6 +3,8 @@ import { Project } from '../models/Project';
 import mongoose from 'mongoose';
 
 export async function projectRoutes(fastify: FastifyInstance) {
+  // Apply authentication to all routes in this plugin
+  fastify.addHook('onRequest', fastify.authenticate);
 
   fastify.get('/projects', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
