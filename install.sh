@@ -322,11 +322,21 @@ async function createAdmin() {
     await mongoose.connect('mongodb://emergent_user:$MONGO_PASSWORD@localhost:27017/emergent_clone?authSource=emergent_clone');
     
     const userSchema = new mongoose.Schema({
-      email: String,
-      password: String,
-      name: String,
-      isAdmin: Boolean,
-    });
+      username: { type: String, required: true, unique: true },
+      email: { type: String, required: true, unique: true },
+      password: { type: String, required: true },
+      name: { type: String, required: true },
+      isAdmin: { type: Boolean, default: false },
+      apiKeys: {
+        openai: String,
+        anthropic: String,
+        google: String,
+      },
+      preferences: {
+        defaultModel: String,
+        defaultProvider: { type: String, default: 'lmstudio' },
+      },
+    }, { timestamps: true });
     
     const User = mongoose.model('User', userSchema);
     
