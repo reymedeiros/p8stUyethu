@@ -10,6 +10,7 @@ export function Sidebar() {
   const { logout, user, token } = useAuthStore();
   const [showNewProject, setShowNewProject] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
+  const [showProviderSettings, setShowProviderSettings] = useState(false);
   const [newProjectData, setNewProjectData] = useState({
     name: '',
     description: '',
