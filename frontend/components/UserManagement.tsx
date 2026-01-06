@@ -85,7 +85,6 @@ export function UserManagement() {
         return;
       }
     }
-    
     try {
       const updateData: any = {
         username: formData.username,
@@ -176,7 +175,9 @@ export function UserManagement() {
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{user.name}</span>
                   {user.isAdmin && (
-                    <Shield className="w-4 h-4 text-primary" title="Admin" />
+                    <Shield className="w-4 h-4 text-primary">
+                      <title>Admin</title>
+                    </Shield>
                   )}
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -290,7 +291,7 @@ export function UserManagement() {
                   className="w-4 h-4"
                 />
                 <label htmlFor="isAdmin" className="text-sm font-medium flex items-center gap-1">
-                  <Shield className="w-4 h-4" />
+                  <Shield className="w-4 h-4" aria-hidden="true" />
                   Admin privileges
                 </label>
               </div>
