@@ -7,7 +7,7 @@ import { FolderOpen, Plus, Trash2, LogOut, Users } from 'lucide-react';
 
 export function Sidebar() {
   const { projects, loadProjects, selectProject, currentProject, deleteProject } = useProjectStore();
-  const { logout, user } = useAuthStore();
+  const { logout, user, token } = useAuthStore();
   const [showNewProject, setShowNewProject] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [newProjectData, setNewProjectData] = useState({
@@ -17,8 +17,10 @@ export function Sidebar() {
   });
 
   useEffect(() => {
-    loadProjects();
-  }, []);
+    if (token) {
+      loadProjects();
+    }
+  }, [token]);
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
