@@ -5,7 +5,7 @@ import { useAuthStore } from '@/lib/store/auth';
 import { Terminal } from 'lucide-react';
 
 export function LoginForm() {
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,7 @@ export function LoginForm() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(emailOrUsername, password);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Authentication failed');
     } finally {
