@@ -23,26 +23,13 @@ async function start() {
     console.log('✅ Connected to MongoDB');
 
     await fastify.register(cors, {
-      origin: (origin, cb) => {
-        // In development, allow all origins
-        if (config.env !== 'production') {
-          cb(null, true);
-          return;
-        }
-        
-        // In production, only allow specific origins
-        const allowedOrigins = [
-          config.frontend.url,
-          'http://localhost:3000',
-        ];
-        
-        if (!origin || allowedOrigins.includes(origin)) {
-          cb(null, true);
-        } else {
-          cb(new Error('Not allowed by CORS'), false);
-        }
-      },
+      origin: true, // Allow all origins
       credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+      exposedHeaders: ['Authorization'],
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
     });
 
     await fastify.register(jwt, {
