@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth';
 import { Terminal } from 'lucide-react';
 
 export function LoginForm() {
+  const router = useRouter();
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,6 +20,9 @@ export function LoginForm() {
 
     try {
       await login(emailOrUsername, password);
+      // Successfully logged in, redirect to main panel
+      router.push('/');
+      router.refresh();
     } catch (err: any) {
       setError(err.response?.data?.error || 'Authentication failed');
     } finally {
