@@ -9,7 +9,7 @@ async function seedAdmin() {
     console.log('✅ Connected to MongoDB');
 
     // Check if admin already exists
-    const existingAdmin = await User.findOne({ email: 'admin' });
+    const existingAdmin = await User.findOne({ username: 'admin' });
     if (existingAdmin) {
       console.log('⚠️  Admin user already exists');
       process.exit(0);
@@ -18,14 +18,16 @@ async function seedAdmin() {
     // Create admin user
     const hashedPassword = await bcrypt.hash('admin123', 10);
     await User.create({
-      email: 'admin',
+      username: 'admin',
+      email: 'admin@example.com',
       password: hashedPassword,
       name: 'Administrator',
       isAdmin: true,
     });
 
     console.log('✅ Admin user created successfully');
-    console.log('   Email: admin');
+    console.log('   Username: admin');
+    console.log('   Email: admin@example.com');
     console.log('   Password: admin123');
     console.log('   IMPORTANT: Change the password after first login!');
     
