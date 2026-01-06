@@ -47,8 +47,12 @@ export async function projectRoutes(fastify: FastifyInstance) {
 
   fastify.post('/projects', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
+      console.log('[Projects POST] Headers:', JSON.stringify(request.headers, null, 2));
+      console.log('[Projects POST] User from JWT:', request.user);
+      
       const userId = request.user?.id;
       if (!userId) {
+        console.log('[Projects POST] No userId found, returning 401');
         return reply.code(401).send({ error: 'Unauthorized' });
       }
 
@@ -62,8 +66,10 @@ export async function projectRoutes(fastify: FastifyInstance) {
         status: 'idle',
       });
 
+      console.log('[Projects POST] Project created successfully');
       return { project };
     } catch (error: any) {
+      console.error('[Projects POST] Error:', error.message);
       return reply.code(500).send({ error: error.message });
     }
   });
