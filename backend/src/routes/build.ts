@@ -10,7 +10,31 @@ export async function buildRoutes(fastify: FastifyInstance) {
     websocket: true
   }, async (connection: any, request: any) => {
     const { projectId } = request.params;
-    const userId = request.user?.id;
+    
+    // Extract and verify JWT token from query parameter
+    let userId: string | undefined;
+    try {
+      const token = (request.query as any).token;
+      if (!token) {
+        connection.socket.send(JSON.stringify({
+          type: 'error',
+          message: 'No authentication token provided'
+        }));
+        connection.socket.close();
+        return;
+      }
+
+      // Verify the JWT token
+      const decoded = await fastify.jwt.verify(token) as any;
+      userId = decoded.id;
+    } catch (error: any) {
+      connection.socket.send(JSON.stringify({
+        type: 'error',
+        message: 'Invalid authentication token'
+      }));
+      connection.socket.close();
+      return;
+    }
 
     if (!userId) {
       connection.socket.send(JSON.stringify({
