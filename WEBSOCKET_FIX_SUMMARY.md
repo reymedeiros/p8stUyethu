@@ -9,6 +9,45 @@ The WebSocket connection for the build endpoint (`/api/build/:projectId`) was fa
 - LM Studio developer log showed nothing (request not reaching LM Studio)
 - Test endpoint worked: `POST http://192.168.1.201/api/providers/test` returned 200 OK
 
+## Architecture Understanding
+
+### Correct System Architecture:
+```
+┌─────────────────────────────────────────────────────────┐
+│  Frontend (Next.js)                    Port 3000        │
+│  - WebSocket connections                                │
+│  - HTTP API calls                                       │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│  Python Proxy (server.py)              Port 8001        │
+│  - Forwards HTTP requests                               │
+│  - Proxies WebSocket connections                        │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│  Node.js Backend (Fastify)             Port 4000        │
+│  - REST API endpoints                                   │
+│  - WebSocket handler                                    │
+│  - Authentication                                       │
+│  - Pipeline orchestration                               │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│  LM Studio (Local AI)                  Port 1234        │
+│  - Local model inference                                │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Key Points:**
+- Python proxy on port 8001 is what supervisor starts
+- Python proxy forwards all requests to Node.js backend on port 4000
+- Python proxy also handles WebSocket upgrade and proxying
+- Frontend always talks to port 8001 (through proxy)
+
 ## Root Cause Analysis
 
 ### Issue 1: Missing Authentication in WebSocket Connection
