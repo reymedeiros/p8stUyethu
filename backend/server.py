@@ -122,6 +122,56 @@ async def proxy(request):
             print(f"Proxy error: {e}")
             return Response(content=f"Proxy error: {str(e)}", status_code=500)
 
+async def websocket_proxy(websocket: WebSocket):
+    """Proxy WebSocket connections to the Node.js backend"""
+    await websocket.accept()
+    
+    # Build the backend WebSocket URL
+    path = websocket.url.path
+    query = str(websocket.url.query)
+    backend_ws_url = f"ws://localhost:4000{path}"
+    if query:
+        backend_ws_url += f"?{query}"
+    
+    print(f"🔌 Proxying WebSocket: {backend_ws_url}")
+    
+    try:
+        # Connect to backend WebSocket
+        async with websockets.connect(backend_ws_url) as backend_ws:
+            # Create tasks for bidirectional forwarding
+            async def forward_to_backend():
+                try:
+                    while True:
+                        message = await websocket.receive_text()
+                        await backend_ws.send(message)
+                except Exception as e:
+                    print(f"Error forwarding to backend: {e}")
+            
+            async def forward_to_client():
+                try:
+                    async for message in backend_ws:
+                        await websocket.send_text(message)
+                except Exception as e:
+                    print(f"Error forwarding to client: {e}")
+            
+            # Run both directions concurrently
+            await asyncio.gather(
+                forward_to_backend(),
+                forward_to_client(),
+                return_exceptions=True
+            )
+    except Exception as e:
+        print(f"WebSocket proxy error: {e}")
+        try:
+            await websocket.send_text(f'{{"type":"error","message":"WebSocket proxy error: {str(e)}"}}')
+        except:
+            pass
+    finally:
+        try:
+            await websocket.close()
+        except:
+            pass
+
 # Create the ASGI application
 app = Starlette(
     routes=[
