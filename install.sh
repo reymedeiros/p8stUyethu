@@ -208,7 +208,7 @@ python3 -m venv /opt/emergent-clone-venv
 
 # Install required Python packages for ASGI proxy
 /opt/emergent-clone-venv/bin/pip install --upgrade pip
-/opt/emergent-clone-venv/bin/pip install httpx starlette uvicorn
+/opt/emergent-clone-venv/bin/pip install httpx starlette uvicorn websockets
 
 echo "Python environment created and configured"
 
