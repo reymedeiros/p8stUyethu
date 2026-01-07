@@ -175,6 +175,7 @@ async def websocket_proxy(websocket: WebSocket):
 # Create the ASGI application
 app = Starlette(
     routes=[
+        WebSocketRoute('/api/build/{project_id}', websocket_proxy),
         Route('/{path:path}', proxy, methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']),
     ],
     on_startup=[startup],
