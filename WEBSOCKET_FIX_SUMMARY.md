@@ -50,9 +50,15 @@ The WebSocket connection for the build endpoint (`/api/build/:projectId`) was fa
 
 ## Root Cause Analysis
 
-### Issue 1: Missing Authentication in WebSocket Connection
+### Issue 1: Python Proxy Missing WebSocket Support
+**Python Proxy (`/app/backend/server.py`)**:
+- Only handled HTTP requests (GET, POST, PUT, DELETE, PATCH, OPTIONS)
+- Did not handle WebSocket upgrade requests
+- WebSocket connections to `/api/build/:projectId` were not being proxied to the Node.js backend
+
+### Issue 2: Missing Authentication in WebSocket Connection
 **Frontend (`/app/frontend/components/PromptPanel.tsx`)**:
-- The code retrieved JWT token: `const token = localStorage.getItem('token');`
+- Retrieved JWT token: `const token = localStorage.getItem('token');`
 - But never sent it with the WebSocket connection
 - Connection was: `new WebSocket(`${wsUrl}/api/build/${currentProject._id}`)`
 
@@ -70,14 +76,13 @@ fastify.post('/providers/test', {
 
 // Broken build endpoint (build.ts)
 fastify.get('/build/:projectId', {
-  websocket: true  // ❌ No auth middleware
+  websocket: true  // ❌ No auth middleware, manual token verification needed
 }, async (connection: any, request: any) => {...});
 ```
 
-### Issue 2: Backend Configuration
-- Supervisor was configured to run Python backend (uvicorn)
-- Project uses TypeScript/Fastify backend
-- Backend was running on wrong port (4000 instead of 8001)
+### Issue 3: Missing Python Dependencies
+- `httpx` library was not installed (needed for HTTP proxying)
+- `websockets` library was not installed (needed for WebSocket proxying)
 
 ## Solution Implemented
 
