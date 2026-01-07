@@ -220,21 +220,32 @@ JWT_SECRET=your-super-secret-jwt-key-change-in-production
 ### Services Running
 ```bash
 $ sudo supervisorctl status
-backend      RUNNING   pid 2603
-frontend     RUNNING   pid 1199
-mongodb      RUNNING   pid 617
+backend      RUNNING   pid 3238  # Python proxy on 8001
+frontend     RUNNING   pid 3236  # Next.js on 3000
+mongodb      RUNNING   pid 3237  # MongoDB on 27017
 ```
 
-### Backend Listening on Correct Port
+### Ports Listening
+```bash
+$ netstat -tlnp | grep -E "(3000|4000|8001|27017)"
+tcp  0.0.0.0:27017  mongod       # MongoDB
+tcp  0.0.0.0:8001   python       # Python proxy
+tcp  0.0.0.0:4000   node         # Node.js backend
+tcp  0.0.0.0:3000   next-server  # Frontend
+```
+
+### Backend Health Check via Proxy
 ```bash
 $ curl http://localhost:8001/health
-{"status":"ok","timestamp":"2026-01-07T01:57:50.773Z"}
+{"status":"ok","timestamp":"2026-01-07T02:01:23.711Z"}
 ```
 
 ### Backend Logs Confirm
 ```
+🚀 Starting Node.js backend from /app/backend/dist/server.js
+✅ Node.js backend is ready
 ✅ Connected to MongoDB
-✅ Server running on http://0.0.0.0:8001
+✅ Server running on http://0.0.0.0:4000
 🤖 LM Studio: http://localhost:1234/v1
 ```
 
