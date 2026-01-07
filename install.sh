@@ -302,9 +302,8 @@ EOF
 
 echo ""
 echo "========================================="
-echo "Step 8: Building backend"
+echo "Step 9: Building backend"
 echo "========================================="
-apt-get install -y build-essential python3
 cd /opt/emergent-clone/backend
 yarn install --production=false
 yarn add -D @types/dockerode
@@ -312,7 +311,7 @@ yarn build
 
 echo ""
 echo "========================================="
-echo "Step 9: Building frontend"
+echo "Step 10: Building frontend"
 echo "========================================="
 cd /opt/emergent-clone/frontend
 yarn install
