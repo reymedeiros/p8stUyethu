@@ -319,7 +319,7 @@ yarn build
 
 echo ""
 echo "========================================="
-echo "Step 10: Creating initial admin user"
+echo "Step 11: Creating initial admin user"
 echo "========================================="
 cd /opt/emergent-clone/backend
 node -e "
