@@ -35,16 +35,12 @@ if [ -z "$LAN_IP" ]; then
   exit 1
 fi
 
-read -p "Enter LM Studio base URL (default: http://localhost:1234/v1): " LM_STUDIO_URL
-LM_STUDIO_URL=${LM_STUDIO_URL:-http://localhost:1234/v1}
-
-# Strip /chat/completions if present
-LM_STUDIO_URL=$(echo "$LM_STUDIO_URL" | sed 's|/chat/completions$||')
-
 echo ""
 echo "Configuration Summary:"
 echo "  LAN IP: $LAN_IP"
-echo "  LM Studio URL: $LM_STUDIO_URL"
+echo ""
+echo "Note: AI providers will be configured through the web interface"
+echo "      after installation (Provider Settings page)"
 echo ""
 read -p "Proceed with installation? (y/n) " -n 1 -r
 echo
