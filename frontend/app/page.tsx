@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sidebar } from '@/components/Sidebar';
-import { Editor } from '@/components/Editor';
-import { PromptPanel } from '@/components/PromptPanel';
-import { LogsPanel } from '@/components/LogsPanel';
 import { useAuthStore } from '@/lib/store/auth';
 import { LoginForm } from '@/components/LoginForm';
+import { HomeView } from '@/components/home/HomeView';
 
 export default function Home() {
   const { token, isLoading, isInitialized, verifyToken } = useAuthStore();
@@ -45,21 +42,6 @@ export default function Home() {
     return <LoginForm />;
   }
 
-  // Show main panel if authenticated
-  return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <div className="flex-1 flex">
-          <div className="flex-1 flex flex-col">
-            <Editor />
-          </div>
-          <div className="w-[400px] border-l border-border flex flex-col">
-            <PromptPanel />
-            <LogsPanel />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  // Show home view if authenticated
+  return <HomeView />;
 }
