@@ -158,27 +158,34 @@ export function AgentChatPanel({
               {/* Border Beam Animation for Waiting State */}
               {isWaiting && (
                 <div 
-                  className="pointer-events-none absolute inset-0 rounded-[inherit] border-beam-container"
+                  className="pointer-events-none absolute inset-0 rounded-[inherit]"
                   style={{
+                    border: 'calc(var(--border-width) * 1px) solid transparent',
+                    maskClip: 'padding-box, border-box',
+                    maskComposite: 'intersect',
+                    mask: 'linear-gradient(transparent, transparent), linear-gradient(white, white)',
+                    WebkitMaskClip: 'padding-box, border-box',
+                    WebkitMaskComposite: 'intersect',
+                    '--border-width': '1',
                     '--duration': '8',
                     '--delay': '0s',
                     '--size': '100',
                     '--anchor': '90',
                     '--color-from': emergentColors.agentWaitingPrimary,
                     '--color-to': 'transparent',
-                    '--border-width': '1',
                   } as React.CSSProperties}
                 >
                   <div 
-                    className="absolute inset-0 rounded-[inherit] border-beam-effect"
+                    className="absolute inset-0"
                     style={{
-                      '--duration': '8',
-                      '--delay': '0s',
-                      '--size': '100',
-                      '--anchor': '90',
-                      '--color-from': emergentColors.agentWaitingPrimary,
-                      '--color-to': 'transparent',
-                      '--border-width': '1',
+                      content: '""',
+                      aspectRatio: '1',
+                      width: 'calc(var(--size) * 1px)',
+                      animation: 'border-beam calc(var(--duration) * 1s) infinite linear',
+                      animationDelay: 'var(--delay)',
+                      background: 'linear-gradient(to left, var(--color-from), var(--color-to), transparent)',
+                      offsetAnchor: 'calc(var(--anchor) * 1%) 50%',
+                      offsetPath: 'rect(0 auto auto 0 round calc(var(--size) * 1px))',
                     } as React.CSSProperties}
                   />
                 </div>
