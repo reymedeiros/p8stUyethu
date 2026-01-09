@@ -114,30 +114,61 @@ export function MessageItem({ message, onRollback, onCopy }: MessageItemProps) {
   // Agent text message
   if (isAgent) {
     return (
-      <div className="message-fade-in my-3" data-testid="message-agent">
-        <p 
-          className="text-sm leading-relaxed whitespace-pre-wrap"
-          style={{ color: emergentColors.foreground }}
-        >
-          {message.content}
-        </p>
+      <div className="message-fade-in my-3 md:my-5" data-testid="message-agent">
+        <div className="flex items-start w-full max-w-4xl mx-auto md:gap-4">
+          {/* Robot Avatar */}
+          <div className="hidden md:block">
+            <div className="relative flex shrink-0 overflow-hidden rounded-full flex-shrink-0 w-10 h-10">
+              <span className="flex h-full w-full items-center justify-center rounded-full bg-transparent">
+                <img 
+                  alt="Robot" 
+                  className="h-8 w-fit" 
+                  src="/robot.svg"
+                />
+              </span>
+            </div>
+          </div>
+          
+          {/* Message Content */}
+          <div className="flex flex-col flex-1 w-full gap-3">
+            <div className="min-w-0 w-full">
+              <div className="my-1 overflow-hidden text-[#dcdce5] font-['Inter'] text-[16px] leading-[28px] font-normal">
+                <div className="selection:text-[#66EAFF] text-wrap break-words selection:bg-[#66EAFF] selection:bg-opacity-10 select-text p-0 text-[#dcdce5] font-['Inter'] text-[16px] leading-[28px] font-normal max-w-[50rem]">
+                  <p className="my-4 font-['Inter']">
+                    {message.content}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Human message
+  // Human message - bubble on the right
   return (
-    <div className="message-fade-in my-3" data-testid="message-human">
-      <div 
-        className="rounded-xl px-4 py-3 inline-block max-w-full"
-        style={{ backgroundColor: emergentColors.secondary }}
-      >
-        <p 
-          className="text-sm leading-relaxed whitespace-pre-wrap"
-          style={{ color: emergentColors.foreground }}
+    <div className="message-fade-in my-4 md:my-8" data-testid="message-human">
+      <div className="group flex flex-col space-y-[10px] w-full md:max-w-4xl md:pl-12 justify-end items-end mx-auto">
+        <div 
+          className="px-4 py-1 rounded-xl rounded-br-none overflow-hidden space-y-[10px] flex items-end max-w-4xl"
+          style={{ 
+            background: 'radial-gradient(50% 50%, rgba(128, 255, 249, 0.16) 0%, rgba(128, 255, 249, 0.08) 100%)',
+            backgroundColor: '#273638'
+          }}
         >
-          {message.content}
-        </p>
+          <div className="flex items-start gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="my-1 overflow-hidden text-[#cfe3e6] font-['Inter'] text-[16px] leading-[28px] font-normal">
+                <div className="selection:text-[#66EAFF] text-wrap break-words selection:bg-[#66EAFF] selection:bg-opacity-10 select-text p-0 text-[#dcdce5] font-['Inter'] text-[16px] leading-[28px] font-normal max-w-[50rem]">
+                  <p className="my-4 font-['Inter']">
+                    {message.content}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
