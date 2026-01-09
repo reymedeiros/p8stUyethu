@@ -77,9 +77,10 @@ export function MessageItem({ message, onRollback, onCopy }: MessageItemProps) {
               
               {/* Code/Command Text */}
               <code 
-                className="text-[#CCEDFF99] font-mono text-sm w-full overflow-hidden"
+                className="text-[#CCEDFF99] text-sm w-full overflow-hidden"
+                style={{ fontFamily: 'JetBrains Mono, monospace' }}
               >
-                <span className="flex items-center gap-2 font-mono text-wrap">
+                <span className="flex items-center gap-2 text-wrap" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                   {renderContentWithPaths(message.fileName || message.content)}
                 </span>
               </code>
@@ -96,14 +97,15 @@ export function MessageItem({ message, onRollback, onCopy }: MessageItemProps) {
           {/* Expanded Content */}
           {isExpanded && message.expandedContent && (
             <div 
-              className="px-4 py-3 font-mono text-sm overflow-x-auto"
+              className="px-4 py-3 text-sm overflow-x-auto"
               style={{ 
                 backgroundColor: emergentColors.codeBackground,
                 borderTop: `1px solid ${emergentColors.border}`,
                 color: emergentColors.subtleText,
+                fontFamily: 'JetBrains Mono, monospace'
               }}
             >
-              <pre className="whitespace-pre-wrap">{message.expandedContent}</pre>
+              <pre className="whitespace-pre-wrap" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{message.expandedContent}</pre>
             </div>
           )}
         </div>
