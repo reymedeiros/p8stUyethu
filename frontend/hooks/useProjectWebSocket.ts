@@ -77,7 +77,7 @@ export function useProjectWebSocket(projectId: string, token: string) {
           const isStep = /^(🎯|⚡|💾|✅|❌)/.test(wsMessage.message);
           
           if (isStep) {
-            const status = wsMessage.message.includes('✅') ? 'completed' as const : 'running' as const;
+            const status = wsMessage.message.includes('✅') ? 'completed' as const : 'pending' as const;
             setMessages((prev) => [
               ...prev,
               {
