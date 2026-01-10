@@ -122,7 +122,7 @@ export async function projectRoutes(fastify: FastifyInstance) {
         return reply.code(404).send({ error: 'Project not found' });
       }
 
-      // Generate password if not exists
+      // Generate password if not exists (for tracking purposes)
       if (!project.codeServerPassword) {
         project.codeServerPassword = crypto.randomBytes(16).toString('hex');
         await project.save();
@@ -133,20 +133,19 @@ export async function projectRoutes(fastify: FastifyInstance) {
       try {
         await fs.mkdir(workspaceDir, { recursive: true });
         
-        // Create a .code-server-password file for this project
-        const passwordFile = path.join(workspaceDir, '.code-server-password');
-        await fs.writeFile(passwordFile, project.codeServerPassword);
-        
         // Initialize with a README if empty
         const readmePath = path.join(workspaceDir, 'README.md');
         try {
           await fs.access(readmePath);
         } catch {
-          await fs.writeFile(readmePath, `# ${project.name}\n\n${project.description || 'Project workspace'}\n`);
+          await fs.writeFile(readmePath, `# ${project.name}\n\n${project.description || 'Project workspace'}\n\nThis is your project workspace. Start coding!\n`);
         }
       } catch (error: any) {
         console.error('Error creating workspace:', error);
       }
+
+      // Get the global code-server password from environment
+      const codeServerPassword = process.env.CODE_SERVER_PASSWORD || '8feb5b8f';
 
       // Construct code-server URL
       // Code-server will be running on port 8080 with password authentication
@@ -157,7 +156,7 @@ export async function projectRoutes(fastify: FastifyInstance) {
 
       return {
         url: codeServerUrl,
-        password: project.codeServerPassword,
+        password: codeServerPassword,
         workspaceDir,
       };
     } catch (error: any) {
