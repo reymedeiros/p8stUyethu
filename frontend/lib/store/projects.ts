@@ -58,6 +58,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       const newProject = response.data.project;
       set((state) => ({ projects: [newProject, ...state.projects] }));
       await get().selectProject(newProject._id);
+      return newProject;
     } catch (error) {
       console.error('Failed to create project:', error);
       throw error;
