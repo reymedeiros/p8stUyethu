@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { emergentColors } from '@/lib/design-tokens';
 import { AgentChatPanel } from './AgentChatPanel';
 import { PreviewPanel } from './PreviewPanel';
-import { Message } from './MessageItem';
 import { CodeServerDialog } from './CodeServerDialog';
 import { projectsAPI } from '@/lib/api';
+import { useProjectWebSocket } from '@/hooks/useProjectWebSocket';
+import { useNetworkUrl } from '@/hooks/useNetworkUrl';
+import { useAuthStore } from '@/lib/store/auth';
 
 // SVG Icons - exact match from reference
 const CodeIcon = () => (
@@ -35,104 +37,26 @@ export function ProjectExecutionView({ projectId, projectName }: ProjectExecutio
   const [codeServerUrl, setCodeServerUrl] = useState('');
   const [codeServerPassword, setCodeServerPassword] = useState('');
   const [loadingCodeServer, setLoadingCodeServer] = useState(false);
-  const [agentStatus, setAgentStatus] = useState<'running' | 'waiting' | 'idle'>('running');
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [previewUrl, setPreviewUrl] = useState<string | undefined>();
   const [panelWidth, setPanelWidth] = useState(50); // percentage
   const [isDragging, setIsDragging] = useState(false);
 
-  // Initialize with demo messages
-  useEffect(() => {
-    const initialMessages: Message[] = [
-      {
-        id: '1',
-        role: 'agent',
-        content: `Now let me check the fonts directory and ensure they're properly set up:`,
-        timestamp: new Date(),
-        type: 'text',
-      },
-      {
-        id: '2',
-        role: 'agent',
-        content: `$ ls -la /app/frontend/public/fonts/ 2>/dev/null | ...`,
-        timestamp: new Date(),
-        type: 'step',
-        status: 'completed',
-        fileName: '$ ls -la /app/frontend/public/fonts/ 2>/dev/null | ...',
-        expandedContent: 'total 200\ndrwxr-xr-x 2 root root  4096 Jan  9 12:08 .\ndrwxr-xr-x 3 root root  4096 Jan  9 12:08 ..\n-rw-r--r-- 1 root root 41108 Jan  9 12:08 Brockmann-Medium-DWnaEPVI.otf\n-rw-r--r-- 1 root root 40164 Jan  9 12:08 Brockmann-Regular-CFBdZhjj.otf',
-      },
-      {
-        id: '3',
-        role: 'agent',
-        content: `Viewed /app/sample_assets`,
-        timestamp: new Date(),
-        type: 'step',
-        status: 'completed',
-        fileName: 'Viewed /app/sample_assets',
-      },
-      {
-        id: '4',
-        role: 'agent',
-        content: `Let me also check the existing API structure and backend to understand the websocket/message handling:`,
-        timestamp: new Date(),
-        type: 'text',
-      },
-      {
-        id: '5',
-        role: 'agent',
-        content: `Viewed /app/frontend/lib/api.ts`,
-        timestamp: new Date(),
-        type: 'step',
-        status: 'completed',
-        fileName: 'Viewed /app/frontend/lib/api.ts',
-      },
-      {
-        id: '6',
-        role: 'agent',
-        content: `Now I have a good understanding of the codebase. Let me create the implementation plan and start building the UI components. I'll create the design tokens and new components to match the Emergent.sh UI.`,
-        timestamp: new Date(),
-        type: 'text',
-      },
-      {
-        id: '7',
-        role: 'agent',
-        content: `Created 7 files`,
-        timestamp: new Date(),
-        type: 'step',
-        status: 'completed',
-        fileName: 'Created 7 files',
-      },
-    ];
-    setMessages(initialMessages);
-  }, []);
+  const { token } = useAuthStore();
+  const { getPreviewUrl } = useNetworkUrl();
+  const { messages, agentStatus, sendMessage, disconnect } = useProjectWebSocket(
+    projectId,
+    token || ''
+  );
+
+  const previewUrl = getPreviewUrl(projectId);
 
   const handleSendMessage = (content: string) => {
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      role: 'human',
-      content,
-      timestamp: new Date(),
-      type: 'text',
-    };
-    setMessages(prev => [...prev, newMessage]);
-    
-    // Simulate agent response
-    setAgentStatus('running');
-    setTimeout(() => {
-      const agentResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'agent',
-        content: 'Processing your request...',
-        timestamp: new Date(),
-        type: 'text',
-      };
-      setMessages(prev => [...prev, agentResponse]);
-      setAgentStatus('waiting');
-    }, 2000);
+    sendMessage(content);
   };
 
   const handleStop = () => {
-    setAgentStatus('waiting');
+    // In the future, we can implement stop functionality
+    // For now, we just disconnect the WebSocket
+    disconnect();
   };
 
   const handleClosePreview = () => {
