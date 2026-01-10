@@ -60,10 +60,10 @@ export function useProjectWebSocket(projectId: string, token: string) {
             ...prev,
             {
               id: messageId,
-              role: 'agent',
-              content: wsMessage.message,
+              role: 'agent' as const,
+              content: wsMessage.message || '',
               timestamp,
-              type: 'text',
+              type: 'text' as const,
             },
           ]);
         }
@@ -77,15 +77,15 @@ export function useProjectWebSocket(projectId: string, token: string) {
           const isStep = /^(🎯|⚡|💾|✅|❌)/.test(wsMessage.message);
           
           if (isStep) {
-            const status = wsMessage.message.includes('✅') ? 'completed' : 'running';
+            const status = wsMessage.message.includes('✅') ? 'completed' as const : 'running' as const;
             setMessages((prev) => [
               ...prev,
               {
                 id: messageId,
-                role: 'agent',
-                content: wsMessage.message,
+                role: 'agent' as const,
+                content: wsMessage.message || '',
                 timestamp,
-                type: 'step',
+                type: 'step' as const,
                 status: status,
                 fileName: wsMessage.message.replace(/^[🎯⚡💾✅❌]\s*/, ''),
               },
@@ -95,10 +95,10 @@ export function useProjectWebSocket(projectId: string, token: string) {
               ...prev,
               {
                 id: messageId,
-                role: 'agent',
-                content: wsMessage.message,
+                role: 'agent' as const,
+                content: wsMessage.message || '',
                 timestamp,
-                type: 'text',
+                type: 'text' as const,
               },
             ]);
           }
@@ -112,10 +112,10 @@ export function useProjectWebSocket(projectId: string, token: string) {
           ...prev,
           {
             id: messageId,
-            role: 'agent',
+            role: 'agent' as const,
             content: '✅ Build completed successfully!',
             timestamp,
-            type: 'text',
+            type: 'text' as const,
           },
         ]);
         setAgentStatus('idle');
@@ -127,10 +127,10 @@ export function useProjectWebSocket(projectId: string, token: string) {
           ...prev,
           {
             id: messageId,
-            role: 'agent',
+            role: 'agent' as const,
             content: `❌ Error: ${wsMessage.message || 'Unknown error'}`,
             timestamp,
-            type: 'text',
+            type: 'text' as const,
           },
         ]);
         setAgentStatus('idle');
@@ -142,11 +142,11 @@ export function useProjectWebSocket(projectId: string, token: string) {
           ...prev,
           {
             id: messageId,
-            role: 'agent',
+            role: 'agent' as const,
             content: wsMessage.content || wsMessage.message || '',
             timestamp,
-            type: 'step',
-            status: wsMessage.status || 'running',
+            type: 'step' as const,
+            status: wsMessage.status || 'running' as const,
             fileName: wsMessage.fileName,
           },
         ]);
