@@ -146,7 +146,7 @@ export function useProjectWebSocket(projectId: string, token: string) {
             content: wsMessage.content || wsMessage.message || '',
             timestamp,
             type: 'step' as const,
-            status: wsMessage.status || 'running' as const,
+            status: (wsMessage.status === 'running' ? 'pending' : wsMessage.status) as 'pending' | 'completed' | 'error' | undefined,
             fileName: wsMessage.fileName,
           },
         ]);
