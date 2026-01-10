@@ -49,19 +49,26 @@ export function PromptInput() {
 
     try {
       const projectName = prompt.slice(0, 30) + (prompt.length > 30 ? '...' : '');
-      await createProject(projectName, prompt, prompt);
       
-      const tabId = `project-${Date.now()}`;
+      // Create the project
+      const response = await createProject(projectName, prompt, prompt);
+      
+      // Get the created project ID from the response
+      const newProjectId = response._id;
+      
+      // Open a new tab for the project execution view
+      const tabId = `project-${newProjectId}`;
       addTab({
         id: tabId,
         title: projectName,
         type: 'project',
-        projectId: tabId,
+        projectId: newProjectId,
       });
 
       setPrompt('');
     } catch (error) {
       console.error('Failed to create project:', error);
+      alert('Failed to create project. Please try again.');
     }
   };
 
