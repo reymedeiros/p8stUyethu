@@ -30,6 +30,10 @@ export class PipelineOrchestrator {
     const results: AgentResult[] = [];
 
     try {
+      // Send initial status
+      onProgress?.('Starting build pipeline...');
+      
+      // Planning phase
       onProgress?.('🎯 Planning project...');
       const planResult = await this.executeAgent('planner', context);
       results.push(planResult);
@@ -39,6 +43,9 @@ export class PipelineOrchestrator {
         throw new Error('Planning failed');
       }
 
+      onProgress?.('✅ Planning completed');
+
+      // Code generation phase
       onProgress?.('⚡ Generating code...');
       const codeResult = await this.executeAgent('codeGenerator', context);
       results.push(codeResult);
@@ -47,9 +54,10 @@ export class PipelineOrchestrator {
       if (codeResult.success && codeResult.fileOperations) {
         onProgress?.('💾 Saving files...');
         await this.applyFileOperations(projectId, codeResult.fileOperations);
+        onProgress?.('✅ Files saved successfully');
       }
 
-      onProgress?.('✅ Pipeline completed!');
+      onProgress?.('✅ Build pipeline completed!');
 
       return results;
     } catch (error: any) {
