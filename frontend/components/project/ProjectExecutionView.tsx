@@ -5,6 +5,8 @@ import { emergentColors } from '@/lib/design-tokens';
 import { AgentChatPanel } from './AgentChatPanel';
 import { PreviewPanel } from './PreviewPanel';
 import { Message } from './MessageItem';
+import { CodeServerDialog } from './CodeServerDialog';
+import { projectsAPI } from '@/lib/api';
 
 // SVG Icons - exact match from reference
 const CodeIcon = () => (
@@ -29,6 +31,10 @@ interface ProjectExecutionViewProps {
 export function ProjectExecutionView({ projectId, projectName }: ProjectExecutionViewProps) {
   const [showPreview, setShowPreview] = useState(false);
   const [showCode, setShowCode] = useState(false);
+  const [showCodeDialog, setShowCodeDialog] = useState(false);
+  const [codeServerUrl, setCodeServerUrl] = useState('');
+  const [codeServerPassword, setCodeServerPassword] = useState('');
+  const [loadingCodeServer, setLoadingCodeServer] = useState(false);
   const [agentStatus, setAgentStatus] = useState<'running' | 'waiting' | 'idle'>('running');
   const [messages, setMessages] = useState<Message[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>();
@@ -133,10 +139,26 @@ export function ProjectExecutionView({ projectId, projectName }: ProjectExecutio
     setShowPreview(false);
   };
 
-  const handleToggleCode = () => {
-    setShowCode(!showCode);
-    if (!showCode) {
-      setShowPreview(false);
+  const handleToggleCode = async () => {
+    if (!showCode && !showCodeDialog) {
+      // Fetch code-server credentials
+      setLoadingCodeServer(true);
+      try {
+        const response = await projectsAPI.getCodeServerCredentials(projectId);
+        setCodeServerUrl(response.data.url);
+        setCodeServerPassword(response.data.password);
+        setShowCodeDialog(true);
+      } catch (error) {
+        console.error('Failed to get code-server credentials:', error);
+        alert('Failed to get code-server credentials. Please try again.');
+      } finally {
+        setLoadingCodeServer(false);
+      }
+    } else {
+      setShowCode(!showCode);
+      if (!showCode) {
+        setShowPreview(false);
+      }
     }
   };
 
@@ -182,6 +204,14 @@ export function ProjectExecutionView({ projectId, projectName }: ProjectExecutio
 
   return (
     <div className="flex flex-col h-full" data-testid="project-execution-view">
+      {/* Code Server Dialog */}
+      <CodeServerDialog
+        isOpen={showCodeDialog}
+        onClose={() => setShowCodeDialog(false)}
+        url={codeServerUrl}
+        password={codeServerPassword}
+      />
+
       {/* Action Buttons - Top Right */}
       <div 
         className="absolute top-[14px] right-4 z-20 flex items-center gap-2"
@@ -189,7 +219,8 @@ export function ProjectExecutionView({ projectId, projectName }: ProjectExecutio
       >
         <button
           onClick={handleToggleCode}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all`}
+          disabled={loadingCodeServer}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${loadingCodeServer ? 'opacity-50 cursor-not-allowed' : ''}`}
           style={{
             backgroundColor: showCode ? emergentColors.secondary : 'transparent',
             border: `1px solid ${emergentColors.border}`,
@@ -198,7 +229,7 @@ export function ProjectExecutionView({ projectId, projectName }: ProjectExecutio
           data-testid="code-button"
         >
           <CodeIcon />
-          Code
+          {loadingCodeServer ? 'Loading...' : 'Code'}
         </button>
         <button
           onClick={handleTogglePreview}
