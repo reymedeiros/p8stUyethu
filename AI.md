@@ -497,4 +497,63 @@ All reference HTML files and fonts are in: `/app/sample_assets/`
 - `Agent_Running_Project_Split_Screen.html`
 - `Agent_Waiting_Project_Split_Screen.html`
 - `main-BirpqjJG.css` (compiled Tailwind CSS)
+
+
+---
+
+## WebSocket Implementation
+
+### Overview
+The application now uses WebSocket for real-time communication between the frontend and backend during project builds.
+
+### Backend WebSocket Route
+- **Endpoint**: `/api/build/:projectId`
+- **Authentication**: JWT token passed as query parameter
+- **Protocol**: WebSocket over HTTP/HTTPS
+- **Proxy**: Python server.py proxies WebSocket connections to Fastify backend
+
+### Frontend WebSocket Integration
+
+#### Files Created:
+1. `/app/frontend/lib/websocket.ts` - WebSocket service class
+2. `/app/frontend/hooks/useProjectWebSocket.ts` - React hook for WebSocket management
+3. `/app/frontend/hooks/useNetworkUrl.ts` - Hook for network-accessible URLs
+
+#### Message Types:
+- `status` - Pipeline status updates
+- `progress` - Step-by-step progress messages
+- `complete` - Build completion
+- `error` - Error messages
+- `step` - Detailed step information with status
+
+#### Agent Status States:
+- `idle` - No active build
+- `running` - Build in progress
+- `waiting` - Waiting for user input (future implementation)
+
+### Project Creation Flow
+
+1. User enters prompt in PromptInput component
+2. Project is created via API (`POST /api/projects`)
+3. New project tab is opened in ProjectExecutionView
+4. WebSocket connection is automatically established
+5. Backend starts build pipeline
+6. Real-time messages stream to frontend
+7. UI updates dynamically based on message type
+
+### Preview URL
+
+The preview URL is dynamically generated based on the current network location:
+- Uses `window.location.host` to ensure network accessibility
+- Format: `${protocol}//${host}/preview/${projectId}`
+- Works across different network configurations (localhost, LAN, WAN)
+
+### Code Server Integration
+
+Code-server credentials are fetched when user clicks "Code" button:
+- **Endpoint**: `GET /api/projects/:id/code-server`
+- Returns URL and password for isolated workspace
+- Each project has workspace at `/workspace/projects/{projectId}`
+
+
 - Font files (.otf)
