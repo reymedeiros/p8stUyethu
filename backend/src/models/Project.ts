@@ -11,6 +11,8 @@ export interface IProject extends Document {
     stack?: string[];
     framework?: string;
     lastExecutionId?: string;
+    providerId?: string;
+    model?: string;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -31,6 +33,8 @@ const projectSchema = new Schema<IProject>({
     stack: [String],
     framework: String,
     lastExecutionId: String,
+    providerId: String,
+    model: String,
   },
 }, { timestamps: true });
 

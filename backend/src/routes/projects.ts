@@ -61,7 +61,7 @@ export async function projectRoutes(fastify: FastifyInstance) {
         return reply.code(401).send({ error: 'Unauthorized' });
       }
 
-      const { name, description, prompt } = request.body as any;
+      const { name, description, prompt, providerId, model } = request.body as any;
 
       const project = await Project.create({
         userId: new mongoose.Types.ObjectId(userId),
@@ -69,9 +69,13 @@ export async function projectRoutes(fastify: FastifyInstance) {
         description,
         prompt,
         status: 'idle',
+        metadata: {
+          providerId,
+          model,
+        },
       });
 
-      console.log('[Projects POST] Project created successfully');
+      console.log('[Projects POST] Project created successfully with provider:', providerId);
       return { project };
     } catch (error: any) {
       console.error('[Projects POST] Error:', error.message);
