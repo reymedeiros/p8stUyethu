@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Paperclip, 
   Github, 
@@ -10,17 +10,14 @@ import {
   ChevronDown,
   Layers,
   FileText,
-  Smartphone
+  Smartphone,
+  Settings,
+  AlertCircle
 } from 'lucide-react';
 import { useTabStore } from '@/lib/store/tabs';
 import { useProjectStore } from '@/lib/store/projects';
 import { emergentColors } from '@/lib/design-tokens';
-
-const AI_MODELS = [
-  { id: 'claude-4.5', name: 'Claude 4.5 Sonnet', icon: '✨' },
-  { id: 'gpt-4', name: 'GPT-4 Turbo', icon: '🤖' },
-  { id: 'gemini-pro', name: 'Gemini Pro', icon: '💎' },
-];
+import { providerApi, ProviderConfig } from '@/lib/providerApi';
 
 const APP_TYPES = [
   { id: 'fullstack', name: 'Full Stack App', icon: Layers },
@@ -37,21 +34,61 @@ const EXAMPLE_PROMPTS = [
 export function PromptInput() {
   const [prompt, setPrompt] = useState('');
   const [selectedAppType, setSelectedAppType] = useState(APP_TYPES[0]);
-  const [selectedModel, setSelectedModel] = useState(AI_MODELS[0]);
+  const [providers, setProviders] = useState<ProviderConfig[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<ProviderConfig | null>(null);
   const [showModelDropdown, setShowModelDropdown] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
+  const [loadingProviders, setLoadingProviders] = useState(true);
+  const [providersError, setProvidersError] = useState<string | null>(null);
 
   const { addTab } = useTabStore();
   const { createProject } = useProjectStore();
 
+  // Load providers on mount
+  useEffect(() => {
+    loadProviders();
+  }, []);
+
+  const loadProviders = async () => {
+    try {
+      setLoadingProviders(true);
+      setProvidersError(null);
+      const configs = await providerApi.getProviderConfigs();
+      
+      // Filter to only enabled providers
+      const enabledProviders = configs.filter(p => p.enabled);
+      setProviders(enabledProviders);
+      
+      // Select primary provider by default, or first available
+      const primary = enabledProviders.find(p => p.isPrimary);
+      setSelectedProvider(primary || enabledProviders[0] || null);
+    } catch (error: any) {
+      console.error('Failed to load providers:', error);
+      setProvidersError('Failed to load AI providers. Please configure them in settings.');
+    } finally {
+      setLoadingProviders(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!prompt.trim()) return;
+    
+    if (!selectedProvider) {
+      alert('Please configure an AI provider in settings before creating a project.');
+      return;
+    }
 
     try {
       const projectName = prompt.slice(0, 30) + (prompt.length > 30 ? '...' : '');
       
-      // Create the project
-      const response = await createProject(projectName, prompt, prompt);
+      // Create the project with provider info
+      const response = await createProject(
+        projectName, 
+        prompt, 
+        prompt,
+        selectedProvider.id,
+        selectedProvider.defaultModel
+      );
       
       // Get the created project ID from the response
       const newProjectId = response._id;
@@ -74,6 +111,19 @@ export function PromptInput() {
 
   const handleExampleClick = (example: string) => {
     setPrompt(`Build me a clone of ${example}...`);
+  };
+
+  // Get display info for provider
+  const getProviderIcon = (type: string) => {
+    const icons: Record<string, string> = {
+      openai: '🤖',
+      anthropic: '✨',
+      gemini: '💎',
+      mistral: '🌬️',
+      groq: '⚡',
+      lmstudio: '🖥️',
+    };
+    return icons[type] || '🤖';
   };
 
   return (
@@ -149,50 +199,104 @@ export function PromptInput() {
 
             {/* Model Selector */}
             <div className="relative ml-2">
-              <button
-                onClick={() => setShowModelDropdown(!showModelDropdown)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
-              >
-                <span className="text-base">{selectedModel.icon}</span>
-                <span style={{ color: emergentColors.foreground }} className="font-medium">{selectedModel.name}</span>
-                <ChevronDown 
-                  className={`w-4 h-4 transition-transform ${showModelDropdown ? 'rotate-180' : ''}`}
+              {loadingProviders ? (
+                <div className="flex items-center gap-2 px-3 py-2 text-sm" style={{ color: emergentColors.mutedForeground }}>
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  Loading...
+                </div>
+              ) : providersError ? (
+                <button
+                  onClick={loadProviders}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
                   style={{ color: emergentColors.mutedForeground }}
-                />
-              </button>
-
-              {showModelDropdown && (
+                  title={providersError}
+                >
+                  <AlertCircle className="w-4 h-4" />
+                  <span>No Providers</span>
+                </button>
+              ) : providers.length === 0 ? (
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    alert('Please configure AI providers in Settings → Provider Settings');
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
+                  style={{ color: emergentColors.mutedForeground }}
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Configure Provider</span>
+                </a>
+              ) : selectedProvider ? (
                 <>
-                  <div 
-                    className="fixed inset-0 z-40" 
-                    onClick={() => setShowModelDropdown(false)}
-                  />
-                  <div 
-                    className="absolute left-0 top-full mt-2 w-56 rounded-lg shadow-xl dropdown-enter z-50 py-2"
-                    style={{
-                      backgroundColor: emergentColors.secondary,
-                      border: `1px solid ${emergentColors.border}`,
-                    }}
+                  <button
+                    onClick={() => setShowModelDropdown(!showModelDropdown)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
                   >
-                    {AI_MODELS.map((model) => (
-                      <button
-                        key={model.id}
-                        onClick={() => {
-                          setSelectedModel(model);
-                          setShowModelDropdown(false);
-                        }}
-                        className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-white/5 transition-colors text-sm"
+                    <span className="text-base">{getProviderIcon(selectedProvider.type)}</span>
+                    <div className="flex flex-col items-start">
+                      <span style={{ color: emergentColors.foreground }} className="font-medium">
+                        {selectedProvider.name}
+                      </span>
+                      <span className="text-xs" style={{ color: emergentColors.mutedForeground }}>
+                        {selectedProvider.defaultModel}
+                      </span>
+                    </div>
+                    <ChevronDown 
+                      className={`w-4 h-4 transition-transform ${showModelDropdown ? 'rotate-180' : ''}`}
+                      style={{ color: emergentColors.mutedForeground }}
+                    />
+                  </button>
+
+                  {showModelDropdown && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setShowModelDropdown(false)}
+                      />
+                      <div 
+                        className="absolute left-0 top-full mt-2 w-64 rounded-lg shadow-xl dropdown-enter z-50 py-2"
                         style={{
-                          backgroundColor: selectedModel.id === model.id ? 'rgba(255,255,255,0.05)' : 'transparent',
+                          backgroundColor: emergentColors.secondary,
+                          border: `1px solid ${emergentColors.border}`,
                         }}
                       >
-                        <span className="text-base">{model.icon}</span>
-                        <span style={{ color: emergentColors.foreground }}>{model.name}</span>
-                      </button>
-                    ))}
-                  </div>
+                        {providers.map((provider) => (
+                          <button
+                            key={provider.id}
+                            onClick={() => {
+                              setSelectedProvider(provider);
+                              setShowModelDropdown(false);
+                            }}
+                            className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-white/5 transition-colors text-sm"
+                            style={{
+                              backgroundColor: selectedProvider.id === provider.id ? 'rgba(255,255,255,0.05)' : 'transparent',
+                            }}
+                          >
+                            <span className="text-base">{getProviderIcon(provider.type)}</span>
+                            <div className="flex flex-col flex-1">
+                              <div className="flex items-center gap-2">
+                                <span style={{ color: emergentColors.foreground }}>{provider.name}</span>
+                                {provider.isPrimary && (
+                                  <span className="text-xs px-1.5 py-0.5 rounded" style={{ 
+                                    backgroundColor: `${emergentColors.accentTeal}20`,
+                                    color: emergentColors.accentTeal 
+                                  }}>
+                                    Primary
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-xs" style={{ color: emergentColors.mutedForeground }}>
+                                {provider.defaultModel}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </>
-              )}
+              ) : null}
             </div>
           </div>
 
@@ -215,7 +319,7 @@ export function PromptInput() {
             {/* Submit Button */}
             <button
               onClick={handleSubmit}
-              disabled={!prompt.trim()}
+              disabled={!prompt.trim() || !selectedProvider}
               className="ml-2 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
               style={{ backgroundColor: emergentColors.foreground }}
             >

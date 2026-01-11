@@ -25,7 +25,7 @@ interface ProjectState {
   isLoading: boolean;
   
   loadProjects: () => Promise<void>;
-  createProject: (name: string, description: string, prompt: string) => Promise<Project>;
+  createProject: (name: string, description: string, prompt: string, providerId?: string, model?: string) => Promise<Project>;
   selectProject: (id: string) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
   
@@ -52,9 +52,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     }
   },
 
-  createProject: async (name: string, description: string, prompt: string) => {
+  createProject: async (name: string, description: string, prompt: string, providerId?: string, model?: string) => {
     try {
-      const response = await projectsAPI.create(name, description, prompt);
+      const response = await projectsAPI.create(name, description, prompt, providerId, model);
       const newProject = response.data.project;
       set((state) => ({ projects: [newProject, ...state.projects] }));
       await get().selectProject(newProject._id);

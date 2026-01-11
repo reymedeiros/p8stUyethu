@@ -57,8 +57,8 @@ export const usersAPI = {
 export const projectsAPI = {
   list: () => api.get('/projects'),
   get: (id: string) => api.get(`/projects/${id}`),
-  create: (name: string, description: string, prompt: string) =>
-    api.post('/projects', { name, description, prompt }),
+  create: (name: string, description: string, prompt: string, providerId?: string, model?: string) =>
+    api.post('/projects', { name, description, prompt, providerId, model }),
   delete: (id: string) => api.delete(`/projects/${id}`),
   getCodeServerCredentials: (id: string) => api.get(`/projects/${id}/code-server`),
 };
