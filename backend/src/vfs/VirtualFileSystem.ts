@@ -82,6 +82,9 @@ export class VirtualFileSystem {
     path: string,
     content: string
   ): Promise<VirtualFile> {
+    // Ensure project directory exists
+    await this.ensureProjectDirectory(projectId);
+    
     const fileDoc = await File.create({
       projectId: new mongoose.Types.ObjectId(projectId),
       path,
@@ -91,6 +94,9 @@ export class VirtualFileSystem {
         size: Buffer.byteLength(content, 'utf8'),
       },
     });
+
+    // Write to filesystem
+    await this.writeToFilesystem(projectId, path, content);
 
     const vFile: VirtualFile = {
       id: fileDoc._id.toString(),
