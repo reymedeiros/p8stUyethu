@@ -544,6 +544,21 @@ else
   "$VENV_DIR/bin/pip" install httpx starlette uvicorn websockets
   
   echo "Python dependencies updated"
+  
+  echo ""
+  echo "========================================="
+  echo "Step 2: Ensuring workspace directories"
+  echo "========================================="
+  
+  # Ensure workspace directories exist (may be missing in older installations)
+  if [ ! -d "/workspace/projects" ]; then
+    mkdir -p /workspace/projects
+    chmod 755 /workspace
+    chmod 777 /workspace/projects
+    echo "  ✓ Created /workspace/projects"
+  else
+    echo "  ✓ Workspace directories already exist"
+  fi
 fi
 
 echo ""
