@@ -506,7 +506,21 @@ EOF
   
   echo ""
   echo "========================================="
-  echo "Step 8: Configuring firewall"
+  echo "Step 8: Creating workspace directories"
+  echo "========================================="
+  
+  # Create workspace directories for generated projects
+  mkdir -p /workspace/projects
+  chmod 755 /workspace
+  chmod 777 /workspace/projects
+  
+  echo "  ✓ Created /workspace/projects"
+  echo "  ✓ Set proper permissions"
+  echo "Workspace directories created"
+  
+  echo ""
+  echo "========================================="
+  echo "Step 9: Configuring firewall"
   echo "========================================="
   ufw --force enable
   ufw allow 22/tcp        # SSH
