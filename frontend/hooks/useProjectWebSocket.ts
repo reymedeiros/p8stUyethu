@@ -87,7 +87,7 @@ export function useProjectWebSocket(projectId: string, token: string) {
                 timestamp,
                 type: 'step' as const,
                 status: status,
-                fileName: wsMessage.message.replace(/^[🎯⚡💾✅❌]\s*/, ''),
+                fileName: (wsMessage.message || '').replace(/^[🎯⚡💾✅❌]\s*/, ''),
               },
             ]);
           } else {
