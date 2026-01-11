@@ -637,7 +637,7 @@ fi
 if [ "$MODE" = "UPDATE" ]; then
   echo ""
   echo "========================================="
-  echo "Step 3: Running database migrations"
+  echo "Step 4: Running database migrations"
   echo "========================================="
   
   # Placeholder for future database migrations
@@ -654,9 +654,9 @@ fi
 # ============================================
 
 if [ "$MODE" = "INSTALL" ]; then
-  STEP_NUM=10
+  STEP_NUM=11
 else
-  STEP_NUM=4
+  STEP_NUM=5
 fi
 
 echo ""
@@ -670,9 +670,9 @@ yarn build
 echo "  ✓ Backend built successfully"
 
 if [ "$MODE" = "INSTALL" ]; then
-  STEP_NUM=11
+  STEP_NUM=12
 else
-  STEP_NUM=5
+  STEP_NUM=6
 fi
 
 echo ""
